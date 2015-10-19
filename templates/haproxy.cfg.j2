@@ -1,0 +1,15 @@
+backend nodes
+	mode http
+	option forwardfor
+	option httpchk HEAD / HTTP/1.1\r\nHost:localhost
+	server backend {{ haproxy_backend_server }}
+	http-request set-header X-Forwarded-Port %[dst_post]
+	http-request add-header X-Forwarded-Proto https if { ssl_fc }
+
+frontend localhost
+	bind *:{{ haproxy_http_port }}
+	bind *:{{ haproxy_https_port }} ssl crt /usr/local/etc/haproxy/certs/server.pem
+	redirect scheme https if !{ ssl_fc }
+
+  mode http
+  default_backend nodes

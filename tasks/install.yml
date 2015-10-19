@@ -1,0 +1,57 @@
+#
+#  Copyright 2015 VMware, Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+---
+- name: Make sure certs directory exists
+  file: path="{{haproxy_base_dir}}/certs" owner="{{ansible_ssh_user}}" state=directory
+
+- name: Create self-signed SSL cert
+  command: "openssl req -new -nodes -x509 -subj '/C=US/ST=California/L=PaloAlto/O=IT/CN=${haproxy_fqdn}' -days 3650 -keyout {{haproxy_base_dir}}/certs/server.key -out {{haproxy_base_dir}}/certs/server.crt"
+  when: haproxy_new_cert
+
+- name: Form self-signed cert pem file
+  shell: "cat {{ haproxy_base_dir }}/certs/server.crt {{haproxy_base_dir}}/certs/server.key > {{haproxy_base_dir}}/certs/server.pem"
+  when: haproxy_new_cert
+
+- name: Set self signed pem file into vars
+  include_vars: main.yml
+  when: haproxy_new_cert
+
+- name: Write haproxy config
+  template:
+    src:   haproxy.cfg.j2
+    dest:  "{{ haproxy_base_dir }}/haproxy.cfg"
+
+- name: Docker requires docker-py
+  pip: name=docker-py
+
+
+- name: haproxy container
+  sudo: yes
+  docker:
+    name: haproxy
+    image: "{{ haproxy_docker_image }}"
+    state: started
+    expose:
+    - "80"
+    - "443"
+    ports:
+    - "80:80"
+    - "443:443"
+    volumes:
+    - "{{haproxy_base_dir}}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro"
+    - "{{haproxy_base_dir}}/certs:/usr/local/etc/haproxy/certs:ro"
+    links:
+    - "{{haproxy_backend_container}}:{{haproxy_backend_container}}"
