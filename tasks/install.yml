@@ -18,7 +18,7 @@
   file: path="{{haproxy_base_dir}}/certs" owner="{{ansible_ssh_user}}" state=directory
 
 - name: Create self-signed SSL cert
-  command: "openssl req -new -nodes -x509 -subj '/C=US/ST=California/L=PaloAlto/O=IT/CN=${haproxy_fqdn}' -days 3650 -keyout {{haproxy_base_dir}}/certs/server.key -out {{haproxy_base_dir}}/certs/server.crt"
+  command: "openssl req -new -nodes -x509 -subj '/C=US/ST=California/L=PaloAlto/O=IT/CN={{haproxy_fqdn}}' -days 3650 -keyout {{haproxy_base_dir}}/certs/server.key -out {{haproxy_base_dir}}/certs/server.crt"
   when: haproxy_new_cert
 
 - name: Form self-signed cert pem file
