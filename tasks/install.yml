@@ -43,7 +43,7 @@
   docker:
     name: haproxy
     image: "{{ haproxy_docker_image }}"
-    state: started
+    state: restarted
     expose:
     - "80"
     - "443"
