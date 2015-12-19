@@ -1,16 +1,18 @@
-haproxy
-===============
+# ansible-role-haproxy
 
 This role installs the haproxy server, running in a Docker container on the target machine,
 and links it to another container in order to provide SSL for the backend service.
 
-Requirements
-------------
+## Requirements
 
 This role requires Ansible 1.4 or higher
 
-Role Variables
---------------
+## Dependencies
+
+- docker
+- pip
+
+## Role Variables
 
 The variables that can be passed to this role and a brief description about
 them are as follows with defaults shown:
@@ -42,8 +44,7 @@ haproxy_ssl_crt: TODO-Find-best-way-to-pass-pem-file-in.
 
 ```
 
-Examples
---------
+## Examples
 
 - hosts: somehost
   sudo: yes
@@ -52,14 +53,8 @@ Examples
   roles:
     - haproxy
 
-Dependencies
-------------
+# License and Copyright
 
-docker
-pip
-
-License and Copyright
------------------------
 Copyright 2015 VMware, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,7 +69,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-Author Information
----------------------
+## Author Information
+
 This role was created in 2015 by [Eric Smalling / VMware](http://www.vmware.com/).
 
